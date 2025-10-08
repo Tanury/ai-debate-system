@@ -1,0 +1,19 @@
+# macOS
+.DS_Store
+
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment files
+.env
+
+# Node/React (if you have a frontend)
+node_modules/
+dist/
+build/
+
+# VS Code
+.vscode/
