@@ -7,7 +7,7 @@ MCP = model context protocol
 from abc import ABC, abstractmethod     #abc - abstract base classes
 from typing import Dict, Any, Optional
 from dataclasses import dataclass
-from datatime import datetime
+from datetime import datetime
 import logging
 
 logger = logging.getLogger(__name__)
