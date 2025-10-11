@@ -26,6 +26,7 @@ security = HTTPBearer()
 async def lifespan(app: FastAPI):
     """Initialize and cleanup resources"""
     logger.info("Starting AI Debate System")
+   
     # Initialize agent coordinator
 
     app.state.coordinator = AgentCoordinator()
