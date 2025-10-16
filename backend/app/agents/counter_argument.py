@@ -65,9 +65,9 @@ class CounterArgumentAgent(BaseAgent):
     async def _identify_weaknesses(self, argument: str) -> List[str]:
         """Identify logical weaknesses in opponent's argument"""
         
-        prompt = f"""Analyze the following argument and identify its weaknesses:
+        prompt = f"""Analyze the following argument and identify 2-3 specific weaknesses:
 
-Argument: {argument}
+Argument: "{argument}" #added quotes 
 
 List specific weaknesses such as:
 - Logical fallacies
@@ -90,7 +90,7 @@ Weaknesses (list 2-3 key ones):"""
             temperature=0.7
         )
         
-        weaknesses = [w.strip() for w in response.split('\n') if w.strip() and len(w.strip()) > 20]#not w.strip().startswith('Weaknesses')]
+        weaknesses = [w.strip().lstrip('-•123456789. ') for w in response.split('\n') if w.strip() and len(w.strip()) > 20]#not w.strip().startswith('Weaknesses')]
         return weaknesses[:3]
     
     async def _generate_counter_with_llm(
@@ -141,23 +141,29 @@ Opponent's Latest Argument (Round {round_number}):
 Identified Weaknesses:
 {chr(10).join([f"- {w}" for w in weaknesses]) if weaknesses else "- General logical gaps"}
 
-Your task: Generate a counter-argument that:
-1. DIRECTLY RESPONDS to their latest points (don't just repeat your previous arguments)
-2. References or builds upon what was said in previous rounds if applicable
-3. Takes the opposite stance with 2-3 NEW specific reasons
-4. Includes concrete examples, data, or cases (name countries, studies, statistics)
-5. Addresses their strongest point before attacking weaknesses
-6. Shows how your position is stronger after {round_number} round(s) of debate
+CRITICAL INSTRUCTIONS:
+1. Your response MUST be directly relevant to the debate topic: "{topic}"
+2. DIRECTLY RESPOND to the opponent's specific points about {topic}
+3. Take the opposite philosophical/practical position on {topic}
+4. Use concrete examples, studies, or philosophical arguments related to {topic}
+5. Do NOT discuss unrelated topics like economics, climate, or politics unless they are central to "{topic}"
+6. If the topic is about free will, consciousness, AI, morality, etc. - stay focused on that specific philosophical question
 
-CRITICAL: Your response must acknowledge what they just said and explain why it's wrong, not just state your position again.
+Your task: Generate a counter-argument that:
+1. Stays 100% on topic about "{topic}"
+2. Takes the opposing stance on this specific debate question
+3. Provides 2-3 NEW specific reasons/examples relevant to {topic}
+4. Addresses their strongest point before attacking weaknesses
+5. References philosophers, studies, or examples relevant to {topic}
+6. Shows how your position on {topic} is stronger after {round_number} round(s)
 
 Your Counter-Argument (4-6 sentences with specific details):"""
 
         counter_arg = await self.llm_service.generate(
             prompt=prompt,
-            max_tokens=500,
-            temperature=0.7,
-            system_prompt=f"You are a skilled debater in round {round_number}. Build upon previous rounds and directly engage with opponent's arguments. Never repeat yourself - each round should introduce new angles and evidence."
+            max_tokens=700,
+            temperature=0.8,
+            system_prompt=f"You are a skilled debater in round {round_number} debating: '{topic}'. Stay 100% focused on this exact topic. Build upon previous rounds and directly engage with the opponent's arguments about {topic}. Never switch to unrelated topics. Each round should introduce new angles about {topic}"
         )
         
         return counter_arg.strip()
