@@ -14,7 +14,7 @@ import logging
 
 from app.config import settings
 from app.api.routes import debate, documents, webscrape
-from app.security.rate_imiter import RateLimiter
+from app.security.rate_limiter import RateLimiter
 from app.security.auth import verify_token
 from app.agents.agent_coordinator import AgentCoordinator
 from app.utils.logger import setup_logger
