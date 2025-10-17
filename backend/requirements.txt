@@ -1,59 +1,46 @@
-# --- Core Framework ---
-fastapi==0.115.2       
-uvicorn[standard]==0.30.6
-starlette==0.40.0
 
-# --- Pydantic & Settings ---
-pydantic==2.9.2         
-pydantic-settings==2.4.0         
-annotated-types==0.7.0
-typing-inspection==0.4.2
-typing_extensions==4.12.2         
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
 
-# --- Security / Auth ---
+# Security
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
-python-multipart==0.0.9
+python-multipart==0.0.6
 
-# --- Database ---
-sqlalchemy==2.0.37        
-alembic==1.13.3
+# HTTP Clients
+httpx==0.25.2  # For Ollama API calls
 
-# --- Async / Networking ---
-httpx==0.28.1
-httpcore==1.0.9
-anyio==4.6.2.post1         
-sniffio==1.3.1
-h11==0.16.0
-requests==2.32.3      
-urllib3==2.2.3           
-idna==3.10
-certifi==2025.10.5
-charset-normalizer==3.3.2
+# Web Scraping
+beautifulsoup4==4.12.2
 
-# --- Background Tasks / Queues ---
-redis==5.1.1         
-celery==5.4.0
-
-# --- AI / NLP / Utilities ---
-openai==2.2.0
-anthropic==0.34.0
-chromadb==0.5.11          
-nltk==3.9.1
-beautifulsoup4==4.12.3
+# Document Processing
 PyPDF2==3.0.1
-python-docx==1.1.2           
-tqdm==4.67.1
+python-docx==1.1.0
 
-# --- CLI / Logging / OS ---
-click==8.1.7         
-distro==1.9.0
+# Vector Store
+chromadb==0.4.18
 
-# --- Testing / Dev Tools ---
-pytest==8.3.3
-pytest-asyncio==0.23.8
-black==24.8.0
-flake8==7.1.1
-nose==1.3.7
+# NLP
+nltk==3.8.1
 
+# Optional: Only install if using paid APIs
+# openai==1.3.7
+# anthropic==0.7.7
 
+# Database
+sqlalchemy==2.0.23
+alembic==1.13.0
+
+# Cache (optional)
+redis==5.0.1
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Code Quality
+black==23.11.0
+flake8==6.1.0
