@@ -21,10 +21,9 @@ class InformationRetrieval:
         self.llm_service = LLMService()
         
         # Initialize ChromaDB
-        self.client = chromadb.Client(Settings(
-            chroma_db_impl="duckdb+parquet",
-            persist_directory=settings.VECTOR_STORE_PATH
-        ))
+        self.client = chromadb.PersistentClient(
+            path=settings.VECTOR_STORE_PATH
+        )
         
         # Get or create collection
         self.collection = self.client.get_or_create_collection(
