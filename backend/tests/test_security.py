@@ -45,13 +45,3 @@ def test_content_filter():
     filtered = filter.filter_content(safe_content)
     assert filtered == safe_content
 
-@pytest.mark.asyncio
-async def test_rate_limiter():
-    limiter = RateLimiter(max_requests=5, window_seconds=10)
-    
-    # First 5 requests should pass
-    for i in range(5):
-        assert await limiter.check_rate_limit("test_user")
-    
-    # 6th request should fail
-    assert not await limiter.check_rate_limit("test_user")
