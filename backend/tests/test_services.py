@@ -61,3 +61,10 @@ async def test_information_retrieval_initialization():
     except Exception as e:
         pytest.skip(f"IR service initialization failed: {e}")
 
+@pytest.mark.asyncio
+async def test_document_processor():
+    """Test document processor"""
+    processor = DocumentProcessor()
+    assert processor is not None
+    assert processor.max_file_size > 0
+
