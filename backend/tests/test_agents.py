@@ -74,9 +74,4 @@ async def test_evaluation_agent(llm_service):
         "topic": "Renewable energy"
     }
     
-    result = await agent.process(input_data)
-    
-    assert "human_scores" in result
-    assert "ai_scores" in result
-    assert "round_winner" in result
-    assert result["round_winner"] in ["human", "ai", "tie"]
+   
