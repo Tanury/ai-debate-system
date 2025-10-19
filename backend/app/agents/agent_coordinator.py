@@ -32,7 +32,7 @@ class AgentCoordinator:
         self.agents: Dict[str, BaseAgent] = {
             "keyword_extractor": KeywordExtractorAgent(),
             "argument_generator": ArgumentGeneratorAgent(self.llm_service, self.ir_service),
-            "counter_argument": CounterArgumentAgent(self.llm_service),
+            "counter_argument": CounterArgumentAgent(self.llm_service, self.ir_service),
             "evaluation_agent": EvaluationAgent(self.llm_service)
         }
         
