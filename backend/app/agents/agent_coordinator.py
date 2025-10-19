@@ -163,4 +163,7 @@ class AgentCoordinator:
             for agent_id, agent in self.agents.items()
         }
     
-    
+    def get_debate_history(self, debate_id: str) -> List[Dict[str, Any]]:
+        """Retrieve debate history"""
+        return self.debate_history.get(debate_id, [])
+
