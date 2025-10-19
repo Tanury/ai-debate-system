@@ -56,7 +56,10 @@ class CounterArgumentAgent(BaseAgent):
             "round": round_number,
             "agent": self.agent_id
         }
-        
+        self.state = "idle"
+        #return result = "idle"
+        return result
+    
         
     
     async def _identify_weaknesses(self, argument: str) -> List[str]:
