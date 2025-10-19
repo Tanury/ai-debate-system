@@ -199,5 +199,14 @@ Provide 2-3 sentences of feedback highlighting strengths and areas for improveme
         )
         
         return feedback.strip()
-    
+
+       def _determine_winner(self, human_scores: Dict[str, float], ai_scores: Dict[str, float]) -> str:
+        """Determine round winner"""
+        if human_scores['total'] > ai_scores['total'] + 0.5:
+            return "human"
+        elif ai_scores['total'] > human_scores['total'] + 0.5:
+            return "ai"
+        else:
+            return "tie"
+
  
