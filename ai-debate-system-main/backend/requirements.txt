@@ -1,4 +1,5 @@
-
+# Added ChromaDB for vector-based semantic search
+# Updated FastAPI and Uvicorn to latest stable versions
 # Core Framework
 fastapi==0.104.1
 uvicorn[standard]==0.24.0
