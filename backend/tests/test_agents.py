@@ -64,3 +64,22 @@ async def test_counter_argument(llm_service):
     assert len(result["counter_argument"]) > 0
     assert "identified_weaknesses" in result
 
+@pytest.mark.asyncio
+async def test_evaluation_agent(llm_service):
+    agent = EvaluationAgent(llm_service)
+    
+    input_data = {
+        "human_argument": "Renewable energy reduces carbon emissions significantly.",
+        "ai_argument": "However, the initial investment costs are prohibitive.",
+        "topic": "Renewable energy"
+    }
+    
+ result = await agent.process(input_data)
+    
+    assert "human_scores" in result
+    assert "ai_scores" in result
+    assert "round_winner" in result
+    assert result["round_winner"] in ["human", "ai", "tie"]
+   
+
+
