@@ -17,7 +17,7 @@ class AgentMessage:
     """msg format for inter-agent communication - MCP"""
     sender: str
     receiver: str
-    message_type = str
+    message_type: str   #fix - change = to :
     content: Dict [str, Any]
     timestamp: datetime
     correlation_id: str
@@ -36,7 +36,7 @@ class BaseAgent(ABC):
         self.state = "idle"
 
     @abstractmethod
-    async def process(self, input_date: Dict[str,Any]) -> Dict[str, Any]:
+    async def process(self, input_data: Dict[str,Any]) -> Dict[str, Any]:
         """
         Main processing method has to implemented by each agent
         """
@@ -56,8 +56,8 @@ class BaseAgent(ABC):
         
         return None
     
-    def create_message(self, original_message:AgentMessage, content: Dict[str, Any]) -> AgentMessage:
-        """create response message"""
+    def _create_response(self, original_message:AgentMessage, content: Dict[str, Any]) -> AgentMessage:
+        """create response message""" #change func name to create_response from create_message
         
         return AgentMessage(
             sender= self.agent_id,
