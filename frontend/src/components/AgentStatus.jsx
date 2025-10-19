@@ -53,4 +53,4 @@ const AgentStatus = ({ currentAgent }) => {
     </div>
   );
 };
-
+export default AgentStatus;
