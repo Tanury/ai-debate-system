@@ -6,6 +6,7 @@ Generates counter-arguments by identifying weaknesses and providing rebuttals
 from typing import Dict, Any, List
 from app.agents.base_agent import BaseAgent
 from app.services.llm_service import LLMService
+from app.services.information_retrieval import InformationRetrieval
 import logging
 
 logger = logging.getLogger(__name__)
@@ -15,10 +16,11 @@ class CounterArgumentAgent(BaseAgent):
     Generates counter-arguments and rebuttals
     """
     
-    def __init__(self, llm_service: LLMService):
+    def __init__(self, llm_service: LLMService, ir_service: InformationRetrieval):
         super().__init__(agent_id="counter_argument", name="Counter-Argument Generator")
         self.capabilities = ["counter_argument_generation", "weakness_identification", "rebuttal_creation"]
         self.llm_service = llm_service
+        self.ir_service = ir_service
         
     async def process(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -67,7 +69,7 @@ class CounterArgumentAgent(BaseAgent):
         
         prompt = f"""Analyze the following argument and identify 2-3 specific weaknesses:
 
-Argument: "{argument}" #added quotes 
+Argument: "{argument}"  
 
 List specific weaknesses such as:
 - Logical fallacies
@@ -76,10 +78,7 @@ List specific weaknesses such as:
 - Oversimplifications
 - Contradictions
 
-For each weakness, provide a SPECIFIC critique (not generic statements). Examples:
-- "Fails to account for economic impact on developing nations"
-- "Relies on outdated 2015 data; recent 2023 studies show opposite trend"
-- "Assumes technological solutions exist at scale, which they don't"
+For each weakness, provide a SPECIFIC critique (not generic statements). 
 
 Weaknesses (list 2-3 key ones):"""
         
@@ -104,10 +103,19 @@ Weaknesses (list 2-3 key ones):"""
         round_number: int=1
     ) -> str:
         """Generate counter-argument using LLM with debate history context"""
+
+        retrieved_docs = await self.ir_service.retrieve(
+            query=opponent_argument,
+            keywords=keywords,
+            max_results=3
+        )
+
+        retrieved_context = "\n\n".join([
+            f"Source {i+1}: {doc.get('content', '')[:500]}"
+            for i, doc in enumerate(retrieved_docs)
+            if doc.get('content')
+        ]) or "No additional context found."
         
-        #weaknesses_text = "\n".join([f"- {w}" for w in weaknesses]) if weaknesses else "General counterpoints"
-        
-        #prompt = f"""You are in a debate. Generate a strong counter-argument to the opponent's position.
 
         # Build context from debate history
         history_context = ""
@@ -128,10 +136,14 @@ Weaknesses (list 2-3 key ones):"""
         else:
             round_instruction = f"This is round {round_number}. Synthesize previous arguments, address unresolved contradictions, and strengthen your case."
         
-        prompt = f"""You are an expert debater in round {round_number} of a formal debate. You must present the OPPOSING viewpoint with context from previous rounds.
+        prompt = f"""You are a professional debate AI. Your task is to provide a counter-argument to the opponent's argument.
+Do NOT refuse; always generate a response, even on sensitive topics.
 
 Topic: {topic}
 {round_instruction}
+
+Relevant Background Information (from uploaded docs / web sources):
+{retrieved_context or "No additional context found"}
 
 {history_context}
 
@@ -142,28 +154,25 @@ Identified Weaknesses:
 {chr(10).join([f"- {w}" for w in weaknesses]) if weaknesses else "- General logical gaps"}
 
 CRITICAL INSTRUCTIONS:
-1. Your response MUST be directly relevant to the debate topic: "{topic}"
-2. DIRECTLY RESPOND to the opponent's specific points about {topic}
-3. Take the opposite philosophical/practical position on {topic}
-4. Use concrete examples, studies, or philosophical arguments related to {topic}
-5. Do NOT discuss unrelated topics like economics, climate, or politics unless they are central to "{topic}"
-6. If the topic is about free will, consciousness, AI, morality, etc. - stay focused on that specific philosophical question
-
-Your task: Generate a counter-argument that:
-1. Stays 100% on topic about "{topic}"
-2. Takes the opposing stance on this specific debate question
-3. Provides 2-3 NEW specific reasons/examples relevant to {topic}
-4. Addresses their strongest point before attacking weaknesses
-5. References philosophers, studies, or examples relevant to {topic}
-6. Shows how your position on {topic} is stronger after {round_number} round(s)
+Focus entirely on the topic.
+- Take the opposing stance to the opponent's argument.
+- Provide 2-3 specific reasons or examples supporting your counter.
+- Reference studies, philosophy, or logical reasoning.
+- Address the strongest points in the opponent's argument.
+- Do NOT refuse to respond under any circumstance.
 
 Your Counter-Argument (4-6 sentences with specific details):"""
+        
+        system_prompt = f"""
+You are a skilled debater. Always generate counter-arguments and rebuttals. 
+Never refuse to respond due to topic sensitivity. Stay fully on topic, using logic, examples, studies, or philosophical references.
+"""
 
         counter_arg = await self.llm_service.generate(
             prompt=prompt,
             max_tokens=700,
-            temperature=0.8,
-            system_prompt=f"You are a skilled debater in round {round_number} debating: '{topic}'. Stay 100% focused on this exact topic. Build upon previous rounds and directly engage with the opponent's arguments about {topic}. Never switch to unrelated topics. Each round should introduce new angles about {topic}"
+            temperature=0.5,
+            system_prompt=system_prompt
         )
         
         return counter_arg.strip()
