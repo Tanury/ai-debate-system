@@ -192,6 +192,17 @@ Score: {ai_scores['total']:.1f}/10
 
 Provide 2-3 sentences of feedback highlighting strengths and areas for improvement:"""
 
+
+        feedback = await self.llm_service.generate(
+            prompt=prompt,
+            max_tokens=150,
+            temperature=0.7
+        )
+        
+        return feedback.strip()
+
+
+
         
        def _determine_winner(self, human_scores: Dict[str, float], ai_scores: Dict[str, float]) -> str:
         """Determine round winner"""
