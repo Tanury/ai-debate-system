@@ -54,4 +54,3 @@ const AgentStatus = ({ currentAgent }) => {
   );
 };
 
-export default AgentStatus;
