@@ -90,7 +90,7 @@ export const useDebate = (topic) => {
     []
   );
 
-  const handleSendMessage = useCallback(() => {
+  const handleSendMessage = useCallback(async() => {
     if (!input.trim() || !debateActive) return;
 
     const currentRound = roundNumber + 1;
@@ -105,6 +105,65 @@ export const useDebate = (topic) => {
     const currentInput = input;
     setInput('');
     setLoading(true);
+    
+    try {
+      // Call real backend API
+      const response = await fetch('http://localhost:8000/api/v1/debate/argument', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          debate_id: 'debate-' + Date.now(),
+          argument: currentInput,
+          round_number: currentRound,
+          topic: topic,
+          debate_history: debateHistory
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const data = await response.json();
+
+            setMessages(prev => [
+        ...prev,
+        {
+          type: 'ai',
+          content: data.ai_argument,
+          timestamp: new Date().toLocaleTimeString(),
+          keywords: data.keywords,
+          round: currentRound
+        },
+        {
+          type: 'evaluation',
+          content: `Round ${currentRound} Score - Human: ${data.evaluation.human_scores.total.toFixed(1)}/10, AI: ${data.evaluation.ai_scores.total.toFixed(1)}/10. ${data.evaluation.feedback}`,
+          timestamp: new Date().toLocaleTimeString(),
+          round: currentRound
+        }
+      ]);
+
+      setScore(prev => ({
+        human: prev.human + Math.round(data.evaluation.human_scores.total),
+        ai: prev.ai + Math.round(data.evaluation.ai_scores.total)
+      }));
+
+      setDebateHistory(prev => [
+        ...prev,
+        {
+          round: currentRound,
+          human: currentInput,
+          ai: data.ai_argument
+        }
+      ]);
+
+      setRoundNumber(currentRound);
+      setLoading(false);
+
+    } catch (error) {
+      console.error('Error getting AI response:', error);
 
     setTimeout(() => {
       setCurrentAgent('Keyword Extractor');
@@ -158,6 +217,7 @@ export const useDebate = (topic) => {
         }, 1200);
       }, 800);
     }, 500);
+  }
   }, [input, debateActive, topic, roundNumber, debateHistory, agents]);
 
   const handleAdmitDefeat = useCallback(
