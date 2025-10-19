@@ -102,13 +102,4 @@ Argument:"""
         
         return argument.strip()
     
-    def _analyze_argument_structure(self, argument: str) -> Dict[str, Any]:
-        """Analyze the structure of generated argument"""
-        sentences = [s.strip() for s in argument.split('.') if s.strip()]
-        
-        return {
-            "sentence_count": len(sentences),
-            "word_count": len(argument.split()),
-            "has_evidence": any(word in argument.lower() for word in ['research', 'study', 'data', 'evidence']),
-            "has_reasoning": any(word in argument.lower() for word in ['because', 'therefore', 'thus', 'hence'])
-        }
+  
